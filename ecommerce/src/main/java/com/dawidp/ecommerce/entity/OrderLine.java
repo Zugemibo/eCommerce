@@ -1,13 +1,7 @@
 package com.dawidp.ecommerce.entity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
@@ -34,6 +28,11 @@ public class OrderLine {
 	@ManyToOne
 	@JsonBackReference
 	private Order order;
+	@Min(0)
 	private int quantity;
 
+	@Transient
+	public double calculateLine(){
+		return product.getPrice()*quantity;
+	}
 }

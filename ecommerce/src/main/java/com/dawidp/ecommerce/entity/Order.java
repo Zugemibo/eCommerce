@@ -3,22 +3,12 @@ package com.dawidp.ecommerce.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.NaturalId;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +26,6 @@ public class Order {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "order_number")
-	@NaturalId
 	private String orderNumber;
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	@NotNull
@@ -47,6 +36,8 @@ public class Order {
 	@CreationTimestamp
 	private LocalDateTime added;
 	private Status status;
+	@Min(0)
+	private double sum;
 	
 	public Order addLine(OrderLine line) {
 		lines.add(line);
@@ -63,6 +54,14 @@ public class Order {
 	public Order removeLines() {
 		lines.clear();
 		return this;
+	}
+
+	@Transient
+	public double calculateOrder(){
+		for(OrderLine line:lines){
+			sum=sum+line.calculateLine();
+		}
+		return sum;
 	}
 
 }

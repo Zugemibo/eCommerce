@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.dawidp.ecommerce.entity.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.dawidp.ecommerce.entity.Order;
 import com.dawidp.ecommerce.entity.OrderLine;
@@ -80,10 +75,9 @@ public class UserController {
 		orderService.save(order);
 
 		order.setOrderNumber(time.getYear() + "/" + time.getMonth() + "/" + time.getDayOfMonth() + "/" + order.getId());
-
+		order.setStatus(Status.ACTIVE);
 		orderService.save(order);
 		return new ResponseEntity<Order>(order, HttpStatus.CREATED);
-		// Do poprawienia
 	}
 
 	@GetMapping("/{userId}")
@@ -112,6 +106,31 @@ public class UserController {
 		orderService.save(order);
 		return new ResponseEntity<Order>(order, HttpStatus.CREATED);
 	}
+	@PutMapping("/{userId}/orders/{orderId}/{orderLineId}/dec")
+	public OrderLine decreaseQuantityByOne(@PathVariable Long userId, @PathVariable Long orderId, @PathVariable Long orderLineId) {
+		checkAccess(userId);
+		OrderLine line = lineService.findLineById(orderLineId);
+		line.setQuantity(line.getQuantity()-1);
+		lineService.save(line);
+		return line;
+	}
+    @PutMapping("/{userId}/orders/{orderId}/{orderLineId}/inc")
+    public OrderLine increaseQuantityByOne(@PathVariable Long userId, @PathVariable Long orderId, @PathVariable Long orderLineId) {
+        checkAccess(userId);
+        OrderLine line = lineService.findLineById(orderLineId);
+		line.setQuantity(line.getQuantity()+1);
+		lineService.save(line);
+        return line;
+    }
+	@DeleteMapping("/{userId}/orders/{orderId}/{orderLineId}")
+	public Order deleteLine(@PathVariable Long userId, @PathVariable Long orderId, @PathVariable Long orderLineId) {
+		checkAccess(userId);
+		Order order = orderService.findOrderById(orderId);
+		OrderLine line = lineService.findLineById(orderLineId);
+		order.removeLine(line);
+		orderService.save(order);
+		return order;
+	}
 
 	@DeleteMapping("/{userId}/orders/{orderId}")
 	public String orderCancel(@PathVariable Long userId, @PathVariable Long orderId) {
@@ -119,5 +138,10 @@ public class UserController {
 		orderService.deleteOrder(orderId);
 		return "Order with id: " + orderId + " has been canceled.";
 	}
+	@PostMapping("/{userId}/orders/{orderId}/checkout")
+    public String orderCheckout(@PathVariable Long userId, @PathVariable Long orderId){
+	    checkAccess(userId);
+	    return orderService.checkout(orderId);
+    }
 	
 }

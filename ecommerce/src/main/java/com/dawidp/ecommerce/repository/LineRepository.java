@@ -6,4 +6,5 @@ import com.dawidp.ecommerce.entity.OrderLine;
 
 public interface LineRepository extends JpaRepository<OrderLine, Long> {
 
+    OrderLine findLineById(Long orderLineId);
 }

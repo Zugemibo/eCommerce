@@ -20,12 +20,25 @@ public class LineService {
 
 	public OrderLine save(OrderLine line) {
 		line.setProduct(productRepository.findProductById(line.getProduct().getId()));
-		return lineRepository.save(line);
-		
+		if(line.getQuantity() > 0){
+			return lineRepository.save(line);
+
+		}else{
+			lineRepository.delete(line);
+			return null;
+		}
 	}
 
 	public List<OrderLine> findAll() {
 		return lineRepository.findAll();
 	}
 
+    public OrderLine findLineById(Long orderLineId) {
+		OrderLine line = lineRepository.findLineById(orderLineId);
+		return line;
+    }
+
+	public void deleteLine(Long orderLineId) {
+
+	}
 }

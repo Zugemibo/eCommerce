@@ -2,6 +2,7 @@ package com.dawidp.ecommerce.service;
 
 import java.util.List;
 
+import com.dawidp.ecommerce.entity.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,4 +34,10 @@ public class OrderService {
 		
 	}
 
+    public String checkout(Long orderId) {
+		Order order = orderRepository.findOrderById(orderId);
+		order.setStatus(Status.ORDERED);
+		orderRepository.save(order);
+		return "Total costs: " + order.calculateOrder();
+	}
 }

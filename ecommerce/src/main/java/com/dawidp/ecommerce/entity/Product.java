@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -42,6 +43,7 @@ public class Product {
 	@JsonView(DataView.ProductAddView.class)
 	private String description;
 	@JsonView(DataView.ProductAddView.class)
+	@Min(0)
 	private double price;
 	@CreationTimestamp
 	@JsonView(DataView.ProductAddView.class)

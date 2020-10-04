@@ -32,7 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/v2/api-docs", 
 			"/swagger-resources/**", 
 			"/swagger-ui.html", 
-			"/webjars/**"};
+			"/webjars/**",
+			"/"};
 			
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService);
